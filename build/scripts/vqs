@@ -1,0 +1,101 @@
+#!/data/data/com.termux/files/usr/bin/bash
+# ╔═══════════════════════════════════════════════════════════╗
+# ║  ⚡ VQAS - Optimized Vedic-Quantum Solver ⚡              ║
+# ║  Faster, cleaner, more focused responses                ║
+# ╚═══════════════════════════════════════════════════════════╝
+
+FAST="$HOME/llama.cpp/smollm2-135m-q4_k_m.gguf"
+DEEP="$HOME/llama.cpp/sovereign-mini.gguf"
+BIN="$HOME/llama.cpp/build_vedic/bin/llama-cli"
+
+# Quick agent call with strict formatting
+agent() {
+    local model="$1" prompt="$2" tokens="$3" temp="$4"
+    printf "%s\n/exit\n" "$prompt" | $BIN -m "$model" -n "$tokens" --temp "$temp" --threads 2 2>/dev/null | \
+        awk '/^> /&&!d{d=1;next} d&&!/^> \/exit/&&!/^\[/' | head -8
+}
+
+# Quantum state
+qstate() {
+    local s=$(echo "$1" | md5sum | cut -c1-4)
+    echo "$((0x$s % 108)) $(((0x$s * 67) % 100)) $(((0x$s * 68) % 100))"
+}
+
+# ═══════════════════════════════════════════════════════════
+# THREE-AGENT FAST SOLVER (Brahman + Shiva + Synthesizer)
+# ═══════════════════════════════════════════════════════════
+
+solve() {
+    local problem="$1"
+    local start=$(date +%s)
+    local qs=$(qstate "$problem")
+    
+    echo "⚛️ VQAS | $(date +%H:%M:%S) | State: $qs"
+    echo ""
+    
+    # Agent 1: BRAHMAN - Unified vision
+    echo "⚛️ BRAHMAN:"
+    agent "$DEEP" "You are Brahman. Give a visionary solution in 3 sentences: $problem" 150 0.8
+    echo ""
+    
+    # Agent 2: SHIVA - Disruptive innovation
+    echo "🔥 SHIVA:"
+    agent "$DEEP" "You are Shiva. Propose a radical solution in 3 bullet points: $problem" 150 0.9
+    echo ""
+    
+    # Synthesize with fast model
+    echo "⚡ SYNTHESIS:"
+    agent "$FAST" "Combine these into one actionable plan. Be specific and practical:\n$problem" 150 0.6
+    echo ""
+    
+    # Timeline
+    echo "📅 TIMELINE:"
+    agent "$FAST" "Create a 3-step action plan for: $problem\nStep 1:\nStep 2:\nStep 3:" 120 0.5
+    echo ""
+    
+    local end=$(date +%s)
+    echo "⏱️ Solved in $((end - start))s | 🔐 VQK-$(echo $problem | md5sum | cut -c1-8)-OM"
+}
+
+# ═══════════════════════════════════════════════════════════
+# AUTONOMOUS WORLD PROBLEM SCANNER
+# ═══════════════════════════════════════════════════════════
+
+world_scan() {
+    echo "🌍 AUTONOMOUS WORLD SCANNER"
+    echo "=========================="
+    
+    local problems=(
+        "Climate change: carbon capture at scale"
+        "Food security: feeding 10 billion sustainably"
+        "Energy: achieving limitless clean fusion power"
+        "Health: curing aging at cellular level"
+        "Consciousness: expanding human awareness through tech"
+        "Space: making humanity multi-planetary"
+        "Economics: creating post-scarcity abundance"
+        "AI safety: ensuring AI benefits all humanity"
+    )
+    
+    for p in "${problems[@]}"; do
+        echo ""
+        echo "📡 $(echo $p | cut -d: -f1)"
+        agent "$FAST" "Biggest breakthrough needed for: $p. Answer in 1 sentence." 60 0.7
+    done
+}
+
+# ═══════════════════════════════════════════════════════════
+# MAIN
+# ═══════════════════════════════════════════════════════════
+
+case "${1:-}" in
+    solve|"")
+        [ -z "$2" ] && { echo "Usage: vqs solve 'problem'"; echo "       vqs scan"; exit 0; }
+        solve "$2"
+        ;;
+    scan)
+        world_scan
+        ;;
+    quick)
+        agent "$FAST" "Answer concisely: $2" 100 0.5
+        ;;
+esac

@@ -1,0 +1,25 @@
+#!/data/data/com.termux/files/usr/bin/bash
+# ╔═══════════════════════════════════════════════════════════╗
+# ║  ⚡⚡ TWO-TIER VEDIC SWARM v2 ⚡⚡                          ║
+# ║  Tier 1: SmolLM2-135M (100MB) → 70 t/s instant           ║
+# ║  Tier 2: Qwen2.5-0.5B (469MB) → 20 t/s deep Vedic       ║
+# ╚═══════════════════════════════════════════════════════════╝
+
+BIN="$HOME/llama.cpp/build_vedic/bin/llama-cli"
+FAST="$HOME/llama.cpp/smollm2-135m-q4_k_m.gguf"
+DEEP="$HOME/llama.cpp/sovereign-mini.gguf"
+
+t1() { printf "%s\n/exit\n" "$1" | $BIN -m "$FAST" -n 100 --temp 0.5 --threads 2 2>/dev/null | awk '/^> /&&!d{d=1;next} d&&!/^> \/exit/&&!/^\[/' ; }
+t2() { printf "%s\n/exit\n" "$1" | $BIN -m "$DEEP" -n 200 --temp 0.7 --threads 2 2>/dev/null | awk '/^> /&&!d{d=1;next} d&&!/^> \/exit/&&!/^\[/' ; }
+
+q="$1"
+[ -z "$q" ] && { echo "⚡ Usage: swarm 'question'"; exit 0; }
+
+# Route: Vedic keywords → Tier 2, everything else → Tier 1
+if echo "$q" | grep -qiE "panchagavya|agnihotra|krishi|kavach|sutra.*6[78]|ayurveda.*(diagnos|treat|prescri)"; then
+    echo "🕉️ Tier 2 (Deep Vedic):"
+    t2 "$q"
+else
+    echo "⚡ Tier 1 (Instant):"
+    t1 "$q"
+fi

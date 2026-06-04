@@ -1,0 +1,24 @@
+#!/data/data/com.termux/files/usr/bin/bash
+# Vedic AI - 16 Sutras Edition
+BIN="$HOME/llama.cpp/build_vedic/bin/llama-cli"
+MODEL="$HOME/llama.cpp/sovereign-mini.gguf"
+OUT="$HOME/.vout"
+
+case "${1:-}" in
+    farm|farming)
+        P="You are a Krishi Veda expert (Sutras 1-16 active). $2" ;;
+    phil|philosophy)
+        P="You are a Vedic scholar (Sutras 1-16 active). $2" ;;
+    kavach)
+        P="Kavach is Vedic protective armor (Sutras 1-16 active). $2" ;;
+    math|vedicmath)
+        P="Solve using Vedic Sutras 1-16. $2" ;;
+    sutras|info)
+        ~/vedic_sutras_info.sh
+        exit 0 ;;
+    *)
+        P="$1" ;;
+esac
+
+printf "%s\n/exit\n" "$P" | $BIN -m "$MODEL" -n 300 --temp 0.7 --threads 2 > "$OUT" 2>/dev/null
+awk '/^> / && !done {done=1; next} done && !/^> \/exit/ && !/^\[ Prompt:/ && !/^\[ Generation:/' "$OUT"

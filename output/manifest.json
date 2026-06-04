@@ -1,0 +1,23 @@
+{
+    "name": "Divine Earthly AI",
+    "version": "1.0.0",
+    "description": "Vedic-Quantum Autonomous AI for Edge Devices",
+    "architecture": "arm64-v8a",
+    "min_android": "7.0",
+    "size": "2.2M",
+    "features": [
+        "Two-Tier AI (135M + 0.5B models)",
+        "8 Deva Agent Swarm",
+        "Vedic-Quantum Solver",
+        "Sutra-Based Encryption",
+        "Autonomous World Scanner",
+        "Offline Operation"
+    ],
+    "models_available": {
+        "smollm2-135m": "100MB - Instant tier (50-95 t/s)",
+        "qwen2.5-0.5b": "469MB - Deep Vedic tier (15-30 t/s)",
+        "llama-3.2-1b": "700MB - Multilingual tier"
+    },
+    "install_command": "curl -L https://github.com/divineearthly/divineearthly/releases/download/v1.0.0/divine-earthly-ai-v1.0.0-arm64.tar.gz | tar -xz && bash install.sh",
+    "github_repo": "https://github.com/divineearthly/divineearthly"
+}
